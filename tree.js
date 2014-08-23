@@ -29,8 +29,36 @@ var treeData = {
 
 var SCALE_X=5*3
 var SCALE_Y=15*3
-var OFFSET_X=30
+var OFFSET_X=0
 var OFFSET_Y=30
+var T=100
+
+function set_time (t)
+{
+  console.log(t)
+  vertsplit
+    .attr("x1", t)
+    .attr("x2", t)
+  t/=SCALE_X
+  
+  lines
+  .style("display", "block")
+  .transition()
+  .duration(T)
+  .style("opacity", function(d){return d.time<t ? 1 : 0})
+  .transition()
+  .delay(T)
+  .style("display", function(d){return d.time<t ? "block" :"none"})
+  
+  circles
+  .style("display", "block")
+  .transition()
+  .duration(T)
+  .style("opacity", function(d){return d.time<t ? 1 : 0})
+  .transition()
+  .delay(T)
+  .style("display", function(d){return d.time<t ? "block" :"none"})
+}
 
 function draw_tree()
 {
@@ -41,7 +69,6 @@ function draw_tree()
     this.number=number
     this.x=starttime*SCALE_X+OFFSET_X
     this.y=number*SCALE_Y+OFFSET_Y
-    
   }
   
   function edge (from, to)
@@ -51,50 +78,74 @@ function draw_tree()
     this.to=to
   }
   
-  var nodes = []
-  var edges = []
+  var nodes=[]
+  var edges=[]
   var c=0
   
   function parseTree(tree)
   {
-    n=new node(tree.name, c++, tree.time)
+    var n=new node(tree.name, c++, tree.time)
     nodes.push(n)
     if ("children" in tree)
-      for (i in tree.children)
+    {
+      tree.children.sort(function(a, b){return a.time<b.time})
+      for (var i in tree.children)
         edges.push(new edge(n, parseTree(tree.children[i])))
+    }
     return n
   }
+  
+  var line_between=d3.svg.diagonal()
+  .source(function(d){return {"x":d.from.y, "y":d.from.x}})
+  .target(function(d){return {"x":d.to.y, "y":d.to.x}})
+  .projection(function(d){return [d.y, d.x]})
   
   parseTree(treeData)
   
   var svg = d3.select("#tree-svg")
-    .attr("width", 1280)
+  .attr("width", 1280)
     .attr("height", 720)
+  
+  var slider = d3.select("#timeline")
+    .style("width", "1280px")
+    .attr("min", 1)
+    .attr("max", 1280)
+    .attr("value", 1280)
+  
+  document.getElementById("timeline")
+          .addEventListener("input",
+                            function(){set_time(document.getElementById("timeline").value)}
+                            )
   
   var root = svg.select("g")
     .attr("class", "tree_container")
   
-  root.selectAll("circle")
-    .data(nodes)
-    .enter().append("circle")
-      .attr("r", function(d, i){return 10})
-      .attr("cx", function(d, i){return d.x})
-      .attr("cy", function(d, i){return d.y})
-      .attr("class", "node")
-      .attr("fill", function(d, i){return d3.rgb(25*i, 25*i, 0)})
-      .text(function(d){d.name})
-  
-  var line_between=d3.svg.diagonal()
-    .source(function(d){return {"x":d.from.y, "y":d.from.x}})
-    .target(function(d){return {"x":d.to.y, "y":d.to.x}})
-    .projection(function(d){return [d.y, d.x]})
-  
-  root.selectAll("path")
+  lines=root.selectAll("path")
     .data(edges)
     .enter().append("path")
       .attr("d", line_between)
       .style("fill", "none")
       .style("stroke", "black")
       .style("stroke-width", 2)
-      
+
+  circles=root.selectAll("circle")
+    .data(nodes)
+    .enter().append("circle")
+      .attr("r", function(d, i){return 10})
+      .attr("cx", function(d, i){return d.x})
+      .attr("cy", function(d, i){return d.y})
+      .attr("class", "node")
+      .attr("fill", "gray")
+      .attr("stroke", d3.rgb(96,64,128))
+      .attr("stroke-width", 2)
+      .text(function(d){d.name})
+  
+  vertsplit=svg.select("line")
+    .attr("stroke", "red")
+    .attr("stroke-width", 5)
+    .style("opacity", 0.5)
+    .attr("y1", 0)
+    .attr("y2", 1280)
+  
+  set_time(1280)
 }

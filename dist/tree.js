@@ -167,7 +167,13 @@ function draw_tree()
                 .duration(200)
                 .style("opacity", .9)
                 .style("transform", "scale(1)");
-            div.html("<img src=\"../data/img/" + d.id + "\">" + "<h3>" + d.name + "</h3><br><strong>Package manager</strong>: " + d.package_manager + "<br><strong>First release</strong>: " + d.release_data + "<br><strong>Desktop environment</strong>: " + d.desktop_environment)
+            div.html("<img src=\"../data/img/" + d.id + "\">" + "<h3>"
+                     + d.name + "</h3><br><strong>Package manager</strong>: "
+                     + d.package_manager
+                     + "<br><strong>First release</strong>: "
+                     + d.release_data
+                     + "<br><strong>Desktop environment</strong>: "
+                     + d.desktop_environment)
                 .style("left", (d.x - 160) + "px")
                 .style("top", (d.y - 130) + "px");
       })

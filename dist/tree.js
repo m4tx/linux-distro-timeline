@@ -39,7 +39,7 @@ function set_time (t)
     .attr("x1", t)
     .attr("x2", t)
   t/=SCALE_X
-  
+
   lines
   .style("display", "block")
   .transition()
@@ -48,7 +48,6 @@ function set_time (t)
   .transition()
   .delay(T)
   .style("display", function(d){return d.time<t ? "block" :"none"})
-  
   circles
   .style("display", "block")
   .transition()
@@ -69,18 +68,18 @@ function draw_tree()
     this.x=starttime*SCALE_X+OFFSET_X
     this.y=number*SCALE_Y+OFFSET_Y
   }
-  
+
   function edge (from, to)
   {
     this.time=Math.max(from.time, to.time)
     this.from=from
     this.to=to
   }
-  
+
   var nodes=[]
   var edges=[]
   var c=0
-  
+
   function parseTree(tree)
   {
     var n=new node(tree.name, c++, tree.time)
@@ -93,32 +92,32 @@ function draw_tree()
     }
     return n
   }
-  
+
   var line_between=d3.svg.diagonal()
   .source(function(d){return {"x":d.from.y, "y":d.from.x}})
   .target(function(d){return {"x":d.to.y, "y":d.to.x}})
   .projection(function(d){return [d.y, d.x]})
-  
+
   parseTree(treeData)
-  
+
   var svg = d3.select("#tree-svg")
   .attr("width", 1280)
     .attr("height", 720)
-  
+
   var slider = d3.select("#timeline")
     .style("width", "1280px")
     .attr("min", 1)
     .attr("max", 1280)
     .attr("value", 1280)
-  
+
   document.getElementById("timeline")
           .addEventListener("input",
                             function(){set_time(document.getElementById("timeline").value)}
                             )
-  
+
   var root = svg.select("g")
     .attr("class", "tree_container")
-  
+
   lines=root.selectAll("path")
     .data(edges)
     .enter().append("path")
@@ -131,6 +130,10 @@ function draw_tree()
     .data(nodes)
     .enter().append("g")
 
+  var div = d3.select("body").append("div")
+     .attr("class", "tooltip")
+     .style("opacity", 0);
+
   circles.selectAll("circle")
     .data(function(d) {return [d]})
     .enter().append("circle")
@@ -141,19 +144,28 @@ function draw_tree()
       .attr("fill", "gray")
       .attr("stroke", d3.rgb(96,64,128))
       .attr("stroke-width", 2)
-  
-  circles.selectAll("text")
-    .data(function(d) {return [d]})
-    .enter().append("text")
-      .text(function(d){d.name})
-//     .text(function(d){d.name})
-  
+      .on("mouseover", function(d) {
+            div.transition()
+                .duration(200)
+                .style("opacity", .9)
+                .style("transform", "scale(1)");
+            div.html("<img src=\"../data/img/" + d.id + "\">" + "<h3>" + d.name + "</h3><br><strong>Package manager</strong>: " + d.package_manager + "<br><strong>First release</strong>: " + d.release_data + "<br><strong>Desktop environment</strong>: " + d.desktop_environment)
+                .style("left", (d.x - 160) + "px")
+                .style("top", (d.y - 130) + "px");
+      })
+      .on("mouseout", function() {
+            div.transition()
+                .duration(200)
+                .style("opacity", 0)
+                .style("transform", "scale(0.75)");
+      });
+
   vertsplit=svg.select("line")
     .attr("stroke", "red")
     .attr("stroke-width", 5)
     .style("opacity", 0.5)
     .attr("y1", 0)
     .attr("y2", 1280)
-  
+
   set_time(1280)
 }

@@ -46,17 +46,15 @@ def process_distro(distro_id, distro_dict, root):
     print('Processing distro: %s' % distro_id)
 
     url_base = 'http://distrowatch.com/table.php?distribution='
-    distro_url = url_base + distro_id
-    html = get_html_object(distro_url)
+    html = get_html_object(url_base + distro_id)
     info_table = html.find('body')[0].xpath('//th[contains(text(),\'Release Date\')]/../..')[0]
 
     cur_distro = distro_dict[distro_id]
     cur_distro['id'] = distro_id
     cur_distro['name'] = html.find('td.TablesTitle').find('h1').text()
-    cur_distro['release_date'] = info_table.xpath('//tr[2]//td[last()]')[0].text.replace('/', '-')
-    cur_distro['desktop_environment'] = info_table.xpath('//tr[8]//td[1]')[0].text
-    cur_distro['package_manager'] = info_table.xpath('//tr[9]//td[1]')[0].text
-    cur_distro['url'] = distro_url
+    cur_distro['release_date'] = info_table.xpath('//th[contains(text(),\'Release Date\')]/../td[last()]')[0].text.replace('/', '-')
+    cur_distro['desktop_environment'] = info_table.xpath('//th[contains(text(),\'Default Desktop\')]/../td[1]')[0].text
+    cur_distro['package_manager'] = info_table.xpath('//th[contains(text(),\'Package Management\')]/../td[1]')[0].text
 
     parents = html.find('body')[0].xpath('//td[@class="TablesTitle"]/ul/li[2]/a/@href')
     print('\t> DEBUG: parents: %s' % str(parents))
@@ -90,13 +88,12 @@ for distro_id in DISTRO_IDS:
                                   release_date=None,
                                   desktop_environment=None,
                                   package_manager=None,
-                                  url=None,
                                   children=[])
 
 for distro_id in DISTRO_IDS:
     process_distro(distro_id, distro_dict, main_data)
 
-data = json.dumps(distro_dict, sort_keys=True)
+data = json.dumps(distro_dict.values(), sort_keys=True, separators=(',', ':'))
 success = False
 with open('../data/distro_info.json', 'w') as f:
     success = f.write(data) == None

@@ -1,4 +1,5 @@
 *.kate-swp
 buildTree.js
 .idea
+__pycache__
 

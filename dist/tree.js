@@ -35,7 +35,6 @@ var T=100
 
 function set_time (t)
 {
-  console.log(t)
   vertsplit
     .attr("x1", t)
     .attr("x2", t)

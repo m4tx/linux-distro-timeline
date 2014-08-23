@@ -19,12 +19,12 @@
 from collections import defaultdict
 from genericpath import isfile
 import json
-
 from os import listdir
 from os.path import isdir, join
 import sys
-
 from optparse import OptionParser
+
+from distro_ids import DISTRO_IDS
 
 # Parse options
 opt_parser = OptionParser(usage="usage: %prog [options] DIRECTORY YEAR")
@@ -57,12 +57,13 @@ for i in range(1, 13):  # Process the months
         path = join(BASE_DIR, dir)
         files = [f for f in listdir(path) if isfile(join(path, f))]
         for filename in files:
-            file_counter += 1
-            with open(join(path, filename), 'r', encoding='utf-8') as file:
-                read = file.read()
-                visits = read.count('\n')
-                visit_dict[i][filename] += visits
-                visit_counter += visits
+            if filename in DISTRO_IDS:  # Prevent from addding INDEX, etc.
+                file_counter += 1
+                with open(join(path, filename), 'r', encoding='utf-8') as file:
+                    read = file.read()
+                    visits = read.count('\n')
+                    visit_dict[i][filename] += visits
+                    visit_counter += visits
 
     print(" Processed %d files; %d visits added." % (
         file_counter, visit_counter), file=sys.stderr)

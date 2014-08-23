@@ -1,2 +1,4 @@
 *.kate-swp
 buildTree.js
+.idea
+

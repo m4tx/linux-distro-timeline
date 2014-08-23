@@ -35,7 +35,6 @@ var T=100
 
 function set_time (t)
 {
-  console.log(t)
   vertsplit
     .attr("x1", t)
     .attr("x2", t)
@@ -50,7 +49,7 @@ function set_time (t)
   .delay(T)
   .style("display", function(d){return d.time<t ? "block" :"none"})
   
-  circles.selectAll("circle")
+  circles
   .style("display", "block")
   .transition()
   .duration(T)
@@ -132,7 +131,7 @@ function draw_tree()
     .data(nodes)
     .enter().append("g")
 
-  var b=circles.selectAll("circle")
+  circles.selectAll("circle")
     .data(function(d) {return [d]})
     .enter().append("circle")
       .attr("r", function(d, i){return 10})
@@ -142,6 +141,11 @@ function draw_tree()
       .attr("fill", "gray")
       .attr("stroke", d3.rgb(96,64,128))
       .attr("stroke-width", 2)
+  
+  circles.selectAll("text")
+    .data(function(d) {return [d]})
+    .enter().append("text")
+      .text(function(d){d.name})
 //     .text(function(d){d.name})
   
   vertsplit=svg.select("line")

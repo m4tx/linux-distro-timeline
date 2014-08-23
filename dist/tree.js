@@ -27,7 +27,7 @@ var treeData = {
  ]
 };
 
-var SCALE_X=5*3
+var SCALE_X=5*20
 var SCALE_Y=15*3
 var OFFSET_X=0
 var OFFSET_Y=30
@@ -61,6 +61,9 @@ function set_time (t)
 
 function draw_tree()
 {
+//   var treeData
+//   d3.json("distro_info.json", function(error, json){treeData=json})
+  
   function node (name, number, starttime)
   {
     this.name=name
@@ -68,6 +71,7 @@ function draw_tree()
     this.number=number
     this.x=starttime*SCALE_X+OFFSET_X
     this.y=number*SCALE_Y+OFFSET_Y
+    this.radious=10
   }
   
   function edge (from, to)
@@ -83,7 +87,7 @@ function draw_tree()
   
   function parseTree(tree)
   {
-    var n=new node(tree.name, c++, tree.time)
+    var n=new node(tree.name, c, c++)
     nodes.push(n)
     if ("children" in tree)
     {
@@ -134,7 +138,7 @@ function draw_tree()
   circles.selectAll("circle")
     .data(function(d) {return [d]})
     .enter().append("circle")
-      .attr("r", function(d, i){return 10})
+      .attr("r", function(d, i){return d.radious})
       .attr("cx", function(d, i){return d.x})
       .attr("cy", function(d, i){return d.y})
       .attr("class", "node")
@@ -145,15 +149,18 @@ function draw_tree()
   circles.selectAll("text")
     .data(function(d) {return [d]})
     .enter().append("text")
-      .text(function(d){d.name})
-//     .text(function(d){d.name})
-  
+      .text(function(d, i){return d.name})
+      .attr("x", function(d, i){return d.x-d.radious-5})
+      .attr("y", function(d, i){return d.y-d.radious-5})
+      .style("fill", "black")
+      .style("font", "20px")
+      
   vertsplit=svg.select("line")
     .attr("stroke", "red")
     .attr("stroke-width", 5)
     .style("opacity", 0.5)
     .attr("y1", 0)
-    .attr("y2", 1280)
+    .attr("y2", 720)
   
   set_time(1280)
 }

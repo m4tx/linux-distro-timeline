@@ -1,10 +1,10 @@
-var T=300
+var T0=100, T=300
 var NUM=805
 var PADDING=30
 var WIDTH=1800
 var HEIGHT=1000
 var SCALE_X=d3.scale.linear()
-  .domain([0,T])
+  .domain([T0,T])
   .range([PADDING, WIDTH-PADDING])
 var SCALE_Y=d3.scale.linear()
   .domain([0,NUM])
@@ -37,9 +37,16 @@ function set_time (t)
   .delay(T)
   .style("display", function(d){return d.time<t ? "block" :"none"})
   
+  var now=numberToDate[t]
+  var year=now.slice(0,4)
+  var month=now[5]=="0" ? now.slice(6,7) : now.slice(5,7)
+  var size_now=popularity[year][month]
+  if (size_now===undefined)
+    return
+  for (var distro in size_now)
+    nodedict[distro].hits=size_now[distro]
   circles.selectAll("circle")
-    .attr("r", function(d, i){return d.hits})
-  
+    .attr("r", function(d, i){return Math.pow(d.hits, 0.3)})
 }
 
 function getTooltipY(y) {
@@ -53,14 +60,15 @@ function getTooltipY(y) {
 function buildTree ()
 {
   var nodes=[]
+  nodedict={}
   var edges=[]
   var c=0
   
   function node (id, number, release_date, name, desktop_environment, package_manager)  {
     this.id=id
     this.time=dateToNumber[release_date.slice(0,7)]
-    if (this.time==undefined)
-      this.time=1
+    if (this.time==undefined || this.time<T0)
+      this.time=T0
     this.number=number
     this.x=SCALE_X(this.time)
     this.y=SCALE_Y(number)
@@ -83,6 +91,7 @@ function buildTree ()
   {
     var n=new node(tree.id, c++, tree.release_date, tree.name, tree.desktop_environment, tree.package_manager)
     nodes.push(n)
+    nodedict[n.id]=n
     if ("children" in tree)
     {
       tree.children.sort(function(a, b){return a.time<b.time})
@@ -118,7 +127,7 @@ function buildTree ()
 
   var slider = d3.select("#timeline")
     .style("width", WIDTH+"px")
-    .attr("min", 1)
+    .attr("min", T0)
     .attr("max", T)
     .attr("value", WIDTH)
   
@@ -140,7 +149,7 @@ function buildTree ()
   circles.selectAll("circle")
     .data(function(d) {return [d]})
     .enter().append("circle")
-      .attr("r", function(d, i){return d.hits})
+      .attr("r", 10)
       .attr("cx", function(d, i){return d.x})
       .attr("cy", function(d, i){return d.y})
       .attr("class", "node")
@@ -169,14 +178,14 @@ function buildTree ()
                 .style("transform", "scale(0.75)");
       });
   
-  circles.selectAll("text")
+/*  circles.selectAll("text")
     .data(function(d) {return [d]})
     .enter().append("text")
       .text(function(d, i){return d.name})
       .attr("x", function(d, i){return d.x-15})
       .attr("y", function(d, i){return d.y-15})
       .style("fill", "black")
-      .style("font", "20px")
+      .style("font", "20px")*/
   
   vertsplit=svg.select("line")
     .attr("stroke", "red")

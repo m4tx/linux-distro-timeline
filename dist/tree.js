@@ -88,8 +88,8 @@ function buildTree ()
     return n
   }
   
-  for (var i in treeData)
-    parseTree(treeData[i])
+  for (var i in treeData.children)
+    parseTree(treeData.children[i])
   
   var line_between=d3.svg.diagonal()
     .source(function(d){return {"x":d.from.y, "y":d.from.x}})

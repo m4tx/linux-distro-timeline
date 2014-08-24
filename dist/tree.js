@@ -76,6 +76,14 @@ function set_time (t)
   .style("display", function(d){return d.time<t ? "block" :"none"})
 }
 
+function getTooltipY(y) {
+    var tmp = y - 132;
+    if (tmp < 0) {
+        tmp += 150;
+    }
+    return tmp;
+}
+
 function draw_tree()
 {
   function node (name, number, starttime)
@@ -175,7 +183,7 @@ function draw_tree()
                      + "<br><strong>Desktop environment</strong>: "
                      + d.desktop_environment)
                 .style("left", (d.x - 160) + "px")
-                .style("top", (d.y - 130) + "px");
+                .style("top", getTooltipY(d.y) + "px");
       })
       .on("mouseout", function() {
             div.transition()

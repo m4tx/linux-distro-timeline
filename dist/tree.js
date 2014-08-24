@@ -174,8 +174,9 @@ function buildTree ()
                 .duration(200)
                 .style("opacity", .9)
                 .style("transform", "scale(1)");
-            div.html("<img src=\"img/" + d.id + ".png\">" + "<h3>"
-                     + d.name + "</h3><br><strong>Package manager</strong>: "
+            div.html("<div class=\"logo\"><img src=\"img/" + d.id
+                     + ".png\"></div>" + "<h3>" + d.name
+                     + "</h3><br><strong>Package manager</strong>: "
                      + d.package_manager
                      + "<br><strong>First release</strong>: "
                      + d.date

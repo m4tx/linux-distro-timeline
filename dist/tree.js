@@ -137,7 +137,7 @@ function draw_tree()
                  .attr("x", 640)
                  .attr("y", 710)
                  .attr("text-anchor", "middle")
-                 .text("urwał")
+                 .text("2014-06")
                  .attr("font-family", "sans-serif")
                  .attr("font-size", "20px")
                  .attr("fill", "black");

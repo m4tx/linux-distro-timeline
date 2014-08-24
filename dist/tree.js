@@ -1,13 +1,13 @@
 var T=140
-var NUM=807
+var NUM=805
 var PADDING=30
-var WIDTH=5000
-var HEIGHT=5000
+var WIDTH=1900
+var HEIGHT=1000
 var SCALE_X=d3.scale.linear()
-  .domain([1,140])
+  .domain([1,T])
   .range([PADDING, WIDTH-PADDING])
 var SCALE_Y=d3.scale.linear()
-  .domain([0,806])
+  .domain([0,NUM])
   .range([PADDING, HEIGHT-PADDING])
 
 function set_time (t)
@@ -42,14 +42,19 @@ function buildTree ()
   var edges=[]
   var c=0
   
-  function node (name, number, starttime)
+  function node (id, number, release_date, name, desktop_enviroment, package_manager)
   {
-    this.name=name
-    this.time=starttime
+    this.id=id
+    this.time=dateToNumber[release_date.slice(0,7)]
     this.number=number
     this.x=SCALE_X(starttime)
     this.y=SCALE_Y(number)
     this.radious=10
+    
+    this.date=release_date
+    this.name=name
+    this.desktop_enviroment=desktop_enviroment
+    this.package_manager=package_manager
   }
   
   function edge (from, to)
@@ -61,7 +66,7 @@ function buildTree ()
   
   function parseTree(tree)
   {
-    var n=new node(tree.id, c++, dateToNumber[tree.release_date.slice(0,7)])
+    var n=new node(tree.id, c++, tree.release_date, tree.name, tree.desktop_enviroment, tree.package_manager)
     nodes.push(n)
     if ("children" in tree)
     {
@@ -72,8 +77,8 @@ function buildTree ()
     return n
   }
   
-  for (var i in treeData)
-    parseTree(treeData[i])
+  for (var i in treeData.children)
+    parseTree(treeData.children[i])
   
   var line_between=d3.svg.diagonal()
     .source(function(d){return {"x":d.from.y, "y":d.from.x}})

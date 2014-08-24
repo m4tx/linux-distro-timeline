@@ -1,4 +1,4 @@
-var T0=100, T=300
+var T0=100, T=299
 var NUM=805
 var PADDING=50
 var WIDTH=screen.width

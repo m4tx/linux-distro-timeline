@@ -48,7 +48,7 @@ function set_time (t)
   circles.selectAll("circle")
     .attr("r", function(d, i){return Math.pow(d.hits, 0.3)})
   circles.selectAll("text")
-    .attr("opacity", function(d, i){ return Math.pow(d.hits, 0.3)>10 ? 1 : 0 })
+    .attr("visibility", function(d, i){ return Math.pow(d.hits, 0.3)>10 ? "visible" : "hidden" })
   
 }
 

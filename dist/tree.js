@@ -2,7 +2,7 @@ var T0=100, T=300
 var NUM=805
 var PADDING=30
 var WIDTH=1800
-var HEIGHT=1000
+var HEIGHT=900
 var SCALE_X=d3.scale.linear()
   .domain([T0,T])
   .range([PADDING, WIDTH-PADDING])
@@ -47,6 +47,9 @@ function set_time (t)
     nodedict[distro].hits=size_now[distro]
   circles.selectAll("circle")
     .attr("r", function(d, i){return Math.pow(d.hits, 0.3)})
+  circles.selectAll("text")
+    .attr("opacity", function(d, i){ return Math.pow(d.hits, 0.3)>10 ? 1 : 0 })
+  
 }
 
 function getTooltipY(y) {
@@ -129,7 +132,7 @@ function buildTree ()
     .style("width", WIDTH+"px")
     .attr("min", T0)
     .attr("max", T)
-    .attr("value", WIDTH)
+    .attr("value", T-10)
   
   var root = svg.select("g")
     .attr("class", "tree_container")
@@ -178,14 +181,14 @@ function buildTree ()
                 .style("transform", "scale(0.75)");
       });
   
-/*  circles.selectAll("text")
+  circles.selectAll("text")
     .data(function(d) {return [d]})
     .enter().append("text")
       .text(function(d, i){return d.name})
-      .attr("x", function(d, i){return d.x-15})
+      .attr("x", function(d, i){return d.x-10})
       .attr("y", function(d, i){return d.y-15})
       .style("fill", "black")
-      .style("font", "20px")*/
+      .style("font", "20px")
   
   vertsplit=svg.select("line")
     .attr("stroke", "red")
@@ -199,7 +202,7 @@ function buildTree ()
                             function(){set_time(document.getElementById("timeline").value)}
                             )
   
-  set_time(T)
+  set_time(T-10)
 }
 
 function init()

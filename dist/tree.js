@@ -18,7 +18,7 @@ function set_time (t)
   vertsplit
     .attr("x1", SCALE_X(t))
     .attr("x2", SCALE_X(t))
-  
+
   lines
   .style("display", "block")
   .transition()
@@ -27,7 +27,7 @@ function set_time (t)
   .transition()
   .delay(T)
   .style("display", function(d){return d.time<t ? "block" :"none"})
-  
+
   circles
   .style("display", "block")
   .transition()
@@ -52,6 +52,16 @@ function set_time (t)
   
 }
 
+function getTooltipX(x) {
+    var tmp = x - 160;
+    if (tmp < 0) {
+        tmp = 0;
+    } else if (tmp > WIDTH - 325) {
+        tmp = WIDTH - 325;
+    }
+    return tmp;
+}
+
 function getTooltipY(y) {
     var tmp = y - 132;
     if (tmp < 0) {
@@ -66,7 +76,7 @@ function buildTree ()
   nodedict={}
   var edges=[]
   var c=0
-  
+
   function node (id, number, release_date, name, desktop_environment, package_manager)  {
     this.id=id
     this.time=dateToNumber[release_date.slice(0,7)]
@@ -76,20 +86,20 @@ function buildTree ()
     this.x=SCALE_X(this.time)
     this.y=SCALE_Y(number)
     this.hits=10
-    
+
     this.date=release_date
     this.name=name
     this.desktop_enviroment=desktop_environment
     this.package_manager=package_manager
   }
-  
+
   function edge (from, to)
   {
     this.time=Math.max(from.time, to.time)
     this.from=from
     this.to=to
   }
-  
+
   function parseTree(tree)
   {
     var n=new node(tree.id, c++, tree.release_date, tree.name, tree.desktop_environment, tree.package_manager)
@@ -103,15 +113,15 @@ function buildTree ()
     }
     return n
   }
-  
+
   for (var i in treeData.children)
     parseTree(treeData.children[i])
-  
+
   var line_between=d3.svg.diagonal()
     .source(function(d){return {"x":d.from.y, "y":d.from.x}})
     .target(function(d){return {"x":d.to.y, "y":d.to.x}})
     .projection(function(d){return [d.y, d.x]})
-  
+
   var svg = d3.select("#tree-svg")
     .attr("width", WIDTH)
     .attr("height", HEIGHT)
@@ -133,10 +143,10 @@ function buildTree ()
     .attr("min", T0)
     .attr("max", T)
     .attr("value", T-10)
-  
+
   var root = svg.select("g")
     .attr("class", "tree_container")
-  
+
   lines=root.selectAll("path")
     .data(edges)
     .enter().append("path")
@@ -171,7 +181,7 @@ function buildTree ()
                      + d.date
                      + "<br><strong>Desktop environment</strong>: "
                      + d.desktop_enviroment)
-                .style("left", (d.x - 160) + "px")
+                .style("left", getTooltipX(d.x) + "px")
                 .style("top", getTooltipY(d.y) + "px");
       })
       .on("mouseout", function() {
@@ -189,7 +199,7 @@ function buildTree ()
       .attr("y", function(d, i){return d.y-15})
       .style("fill", "black")
       .style("font", "20px")
-  
+
   vertsplit=svg.select("line")
     .attr("stroke", "red")
     .attr("stroke-width", 5)

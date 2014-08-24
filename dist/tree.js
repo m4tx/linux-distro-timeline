@@ -1,7 +1,7 @@
 var T0=100, T=300
 var NUM=805
 var PADDING=50
-var WIDTH=1800
+var WIDTH=screen.width
 var HEIGHT=5000
 var SCALE_X=d3.scale.linear()
   .domain([T0,T])

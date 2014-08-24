@@ -1,8 +1,8 @@
 var T=141
 var NUM=805
 var PADDING=30
-var WIDTH=1900
-var HEIGHT=1000
+var WIDTH=1800
+var HEIGHT=10000
 var SCALE_X=d3.scale.linear()
   .domain([0,T])
   .range([PADDING, WIDTH-PADDING])
@@ -34,6 +34,10 @@ function set_time (t)
   .transition()
   .delay(T)
   .style("display", function(d){return d.time<t ? "block" :"none"})
+  
+  circles.selectAll("circle")
+    .attr("r", function(d, i){return d.hits})
+  
 }
 
 function buildTree ()
@@ -51,7 +55,7 @@ function buildTree ()
     this.number=number
     this.x=SCALE_X(this.time)
     this.y=SCALE_Y(number)
-    this.radious=10
+    this.hits=10
     
     this.date=release_date
     this.name=name
@@ -105,7 +109,7 @@ function buildTree ()
     .enter().append("path")
       .attr("d", line_between)
       .style("fill", "none")
-      .style("stroke", "black")
+      .style("stroke", "rgba(255,255,255,0.5)")
       .style("stroke-width", 2)
 
   circles=root.selectAll("g")
@@ -115,11 +119,11 @@ function buildTree ()
   circles.selectAll("circle")
     .data(function(d) {return [d]})
     .enter().append("circle")
-      .attr("r", function(d, i){return d.radious})
+      .attr("r", function(d, i){return d.hits})
       .attr("cx", function(d, i){return d.x})
       .attr("cy", function(d, i){return d.y})
       .attr("class", "node")
-      .attr("fill", "gray")
+      .attr("fill", "white")
       .attr("stroke", d3.rgb(96,64,128))
       .attr("stroke-width", 2)
   
@@ -127,8 +131,8 @@ function buildTree ()
     .data(function(d) {return [d]})
     .enter().append("text")
       .text(function(d, i){return d.name})
-      .attr("x", function(d, i){return d.x-d.radious-5})
-      .attr("y", function(d, i){return d.y-d.radious-5})
+      .attr("x", function(d, i){return d.x-15})
+      .attr("y", function(d, i){return d.y-15})
       .style("fill", "black")
       .style("font", "20px")
   

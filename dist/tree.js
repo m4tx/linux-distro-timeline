@@ -1,44 +1,21 @@
-var treeData = {
- "name": "flare",
- "time": 10,
- "children": [
-  {
-   "name": "analytics",
-   "time": 21,
-   "children": [
-    {
-     "name": "cluster",
-     "time": 33,
-     "children": [
-      {"name": "AgglomerativeCluster", "time": 39},
-      {"name": "CommunityStructure", "time": 38},
-      {"name": "MergeEdge", "time": 74}
-     ]
-    }]
-   },
-   {
-    "name": "graph",
-    "time": 20,
-    "children": [
-    {"name": "BetweennessCentrality", "time": 35},
-    {"name": "LinkDistance", "time": 57}
-    ]
-   }
- ]
-};
-
-var SCALE_X=5*20
-var SCALE_Y=15*3
-var OFFSET_X=0
-var OFFSET_Y=30
-var T=100
+var T=140
+var NUM=807
+var PADDING=30
+var WIDTH=5000
+var HEIGHT=5000
+var SCALE_X=d3.scale.linear()
+  .domain([1,140])
+  .range([PADDING, WIDTH-PADDING])
+var SCALE_Y=d3.scale.linear()
+  .domain([0,806])
+  .range([PADDING, HEIGHT-PADDING])
 
 function set_time (t)
 {
+  
   vertsplit
-    .attr("x1", t)
-    .attr("x2", t)
-  t/=SCALE_X
+    .attr("x1", SCALE_X(t))
+    .attr("x2", SCALE_X(t))
   
   lines
   .style("display", "block")
@@ -59,18 +36,19 @@ function set_time (t)
   .style("display", function(d){return d.time<t ? "block" :"none"})
 }
 
-function draw_tree()
+function buildTree ()
 {
-//   var treeData
-//   d3.json("distro_info.json", function(error, json){treeData=json})
+  var nodes=[]
+  var edges=[]
+  var c=0
   
   function node (name, number, starttime)
   {
     this.name=name
     this.time=starttime
     this.number=number
-    this.x=starttime*SCALE_X+OFFSET_X
-    this.y=number*SCALE_Y+OFFSET_Y
+    this.x=SCALE_X(starttime)
+    this.y=SCALE_Y(number)
     this.radious=10
   }
   
@@ -81,13 +59,9 @@ function draw_tree()
     this.to=to
   }
   
-  var nodes=[]
-  var edges=[]
-  var c=0
-  
   function parseTree(tree)
   {
-    var n=new node(tree.name, c, c++)
+    var n=new node(tree.id, c++, dateToNumber[tree.release_date.slice(0,7)])
     nodes.push(n)
     if ("children" in tree)
     {
@@ -98,27 +72,23 @@ function draw_tree()
     return n
   }
   
-  var line_between=d3.svg.diagonal()
-  .source(function(d){return {"x":d.from.y, "y":d.from.x}})
-  .target(function(d){return {"x":d.to.y, "y":d.to.x}})
-  .projection(function(d){return [d.y, d.x]})
+  for (var i in treeData)
+    parseTree(treeData[i])
   
-  parseTree(treeData)
+  var line_between=d3.svg.diagonal()
+    .source(function(d){return {"x":d.from.y, "y":d.from.x}})
+    .target(function(d){return {"x":d.to.y, "y":d.to.x}})
+    .projection(function(d){return [d.y, d.x]})
   
   var svg = d3.select("#tree-svg")
-  .attr("width", 1280)
-    .attr("height", 720)
+    .attr("width", WIDTH)
+    .attr("height", HEIGHT)
   
   var slider = d3.select("#timeline")
-    .style("width", "1280px")
+    .style("width", WIDTH+"px")
     .attr("min", 1)
-    .attr("max", 1280)
-    .attr("value", 1280)
-  
-  document.getElementById("timeline")
-          .addEventListener("input",
-                            function(){set_time(document.getElementById("timeline").value)}
-                            )
+    .attr("max", T)
+    .attr("value", WIDTH)
   
   var root = svg.select("g")
     .attr("class", "tree_container")
@@ -154,13 +124,37 @@ function draw_tree()
       .attr("y", function(d, i){return d.y-d.radious-5})
       .style("fill", "black")
       .style("font", "20px")
-      
+  
   vertsplit=svg.select("line")
     .attr("stroke", "red")
     .attr("stroke-width", 5)
     .style("opacity", 0.5)
     .attr("y1", 0)
-    .attr("y2", 720)
+    .attr("y2", HEIGHT)
+
+  document.getElementById("timeline")
+          .addEventListener("input",
+                            function(){set_time(document.getElementById("timeline").value)}
+                            )
   
   set_time(1280)
+}
+
+function init()
+{
+  d3.json("distro_info.json", function(error, json)
+  {
+    treeData=json
+    d3.json("months_list.json", function(error, json)
+    {
+      dateToNumber=json[0]
+      numberToDate=json[1]
+      d3.json("popularity.json",  function(error, json)
+      {
+        popularity=json
+        buildTree()
+      })
+    })
+  })
+  
 }

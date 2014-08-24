@@ -24,6 +24,18 @@ import json
 import os.path
 
 
+def print_log(text):
+    print_log.log += text + '\n'
+    print(text)
+print_log.log = ''
+
+def save_log():
+    success = False
+    with open('distro_info_downloader.log', 'w') as f:
+        success = f.write(print_log.log) == None
+    return success
+    
+
 def get_html_object(url):
     html_src = urlopen(url).read()
     return PyQuery(html_src)
@@ -31,7 +43,7 @@ def get_html_object(url):
 
 def download_image(url, file_location):
     if os.path.isfile(file_location) == True:
-        print('\t> Image already downloaded, skipping...')
+        print_log('\t> Image already downloaded, skipping...')
         return True
     bin_data = urlopen(url).read()
     result = False
@@ -43,7 +55,7 @@ def download_image(url, file_location):
 
 
 def process_distro(distro_id, distro_dict, root):
-    print('Processing distro: %s' % distro_id)
+    print_log('Processing distro: %s' % distro_id)
 
     url_base = 'http://distrowatch.com/table.php?distribution='
     html = get_html_object(url_base + distro_id)
@@ -57,17 +69,15 @@ def process_distro(distro_id, distro_dict, root):
     cur_distro['package_manager'] = info_table.xpath('//th[contains(text(),\'Package Management\')]/../td[1]')[0].text
 
     parents = html.find('body')[0].xpath('//td[@class="TablesTitle"]/ul/li[2]/a/@href')
-    print('\t> DEBUG: parents: %s' % str(parents))
-    for p in parents:
-        if p == distro_id:
-            parents.remove(p)
-    if '' in parents:
-        parents.remove('')
+    print_log('\t> DEBUG: parents: %s' % str(parents))
+    for distro in ['', distro_id]:
+        if distro in parents:
+            parents.remove(distro)
 
     if len(parents) == 0:
-        print('\t> Root distro!')
+        print_log('\t> Root distro!')
     if len(parents) > 1:
-        print('\t> Multi parent! List: %s' % str(parents))
+        print_log('\t> Multi parent! List: %s' % str(parents))
 
     parent = distro_dict[parents[-1]] if parents else root
     parent['children'].append(distro_dict[distro_id])
@@ -76,7 +86,7 @@ def process_distro(distro_id, distro_dict, root):
     extension = img_url.split('.')[-1]
     file_location = '../data/img/%s.%s' % (distro_id, extension)
     if not download_image(img_url, file_location):
-        print('\t> Image downloading error! Continuing...')
+        print_log('\t> Image downloading error! Continuing...')
 
 
 distro_dict = dict()
@@ -93,8 +103,11 @@ for distro_id in DISTRO_IDS:
 for distro_id in DISTRO_IDS:
     process_distro(distro_id, distro_dict, main_data)
 
-data = json.dumps(distro_dict.values(), sort_keys=True, separators=(',', ':'))
+
+data = json.dumps(main_data, sort_keys=True, separators=(',', ':'))
 success = False
 with open('../data/distro_info.json', 'w') as f:
     success = f.write(data) == None
-print('Status: %s!', 'done' if success else 'fail')
+print_log('Status: %s!' % ('done' if success else 'fail'))
+
+print('Saving log status: %s!' % ('done' if save_log() else 'fail'))

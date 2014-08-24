@@ -1,8 +1,8 @@
-var T=141
+var T=300
 var NUM=805
 var PADDING=30
 var WIDTH=1800
-var HEIGHT=10000
+var HEIGHT=1000
 var SCALE_X=d3.scale.linear()
   .domain([0,T])
   .range([PADDING, WIDTH-PADDING])
@@ -190,7 +190,7 @@ function buildTree ()
                             function(){set_time(document.getElementById("timeline").value)}
                             )
   
-  set_time(139)
+  set_time(T)
 }
 
 function init()

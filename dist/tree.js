@@ -1,10 +1,10 @@
-var T=140
+var T=141
 var NUM=805
 var PADDING=30
 var WIDTH=1900
 var HEIGHT=1000
 var SCALE_X=d3.scale.linear()
-  .domain([1,T])
+  .domain([0,T])
   .range([PADDING, WIDTH-PADDING])
 var SCALE_Y=d3.scale.linear()
   .domain([0,NUM])
@@ -55,6 +55,8 @@ function buildTree ()
   function node (id, number, release_date, name, desktop_environment, package_manager)  {
     this.id=id
     this.time=dateToNumber[release_date.slice(0,7)]
+    if (this.time==undefined)
+      this.time=1
     this.number=number
     this.x=SCALE_X(this.time)
     this.y=SCALE_Y(number)

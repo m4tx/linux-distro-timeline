@@ -9,10 +9,12 @@ var SCALE_X=d3.scale.linear()
 var SCALE_Y=d3.scale.linear()
   .domain([0,NUM])
   .range([PADDING, HEIGHT-PADDING])
+var monthText;
 
 function set_time (t)
 {
-  
+    monthText.text(numberToDate[t]);
+
   vertsplit
     .attr("x1", SCALE_X(t))
     .attr("x2", SCALE_X(t))
@@ -36,24 +38,31 @@ function set_time (t)
   .style("display", function(d){return d.time<t ? "block" :"none"})
 }
 
+function getTooltipY(y) {
+    var tmp = y - 132;
+    if (tmp < 0) {
+        tmp += 150;
+    }
+    return tmp;
+}
+
 function buildTree ()
 {
   var nodes=[]
   var edges=[]
   var c=0
   
-  function node (id, number, release_date, name, desktop_enviroment, package_manager)
-  {
+  function node (id, number, release_date, name, desktop_environment, package_manager)  {
     this.id=id
     this.time=dateToNumber[release_date.slice(0,7)]
     this.number=number
-    this.x=SCALE_X(starttime)
+    this.x=SCALE_X(this.time)
     this.y=SCALE_Y(number)
     this.radious=10
     
     this.date=release_date
     this.name=name
-    this.desktop_enviroment=desktop_enviroment
+    this.desktop_enviroment=desktop_environment
     this.package_manager=package_manager
   }
   
@@ -66,7 +75,7 @@ function buildTree ()
   
   function parseTree(tree)
   {
-    var n=new node(tree.id, c++, tree.release_date, tree.name, tree.desktop_enviroment, tree.package_manager)
+    var n=new node(tree.id, c++, tree.release_date, tree.name, tree.desktop_environment, tree.package_manager)
     nodes.push(n)
     if ("children" in tree)
     {
@@ -77,8 +86,8 @@ function buildTree ()
     return n
   }
   
-  for (var i in treeData.children)
-    parseTree(treeData.children[i])
+  for (var i in treeData)
+    parseTree(treeData[i])
   
   var line_between=d3.svg.diagonal()
     .source(function(d){return {"x":d.from.y, "y":d.from.x}})
@@ -88,7 +97,19 @@ function buildTree ()
   var svg = d3.select("#tree-svg")
     .attr("width", WIDTH)
     .attr("height", HEIGHT)
-  
+
+  monthText = svg.append("text")
+                 .attr("x", 10)
+                 .attr("y", 25)
+                 .text("2014-06")
+                 .attr("font-family", "sans-serif")
+                 .attr("font-size", "20px")
+                 .attr("fill", "black");
+
+   var div = d3.select("body").append("div")
+     .attr("class", "tooltip")
+     .style("opacity", 0);
+
   var slider = d3.select("#timeline")
     .style("width", WIDTH+"px")
     .attr("min", 1)
@@ -120,6 +141,27 @@ function buildTree ()
       .attr("fill", "gray")
       .attr("stroke", d3.rgb(96,64,128))
       .attr("stroke-width", 2)
+      .on("mouseover", function(d) {
+            div.transition()
+                .duration(200)
+                .style("opacity", .9)
+                .style("transform", "scale(1)");
+            div.html("<img src=\"../data/img/" + d.id + ".png\">" + "<h3>"
+                     + d.name + "</h3><br><strong>Package manager</strong>: "
+                     + d.package_manager
+                     + "<br><strong>First release</strong>: "
+                     + d.date
+                     + "<br><strong>Desktop environment</strong>: "
+                     + d.desktop_enviroment)
+                .style("left", (d.x - 160) + "px")
+                .style("top", getTooltipY(d.y) + "px");
+      })
+      .on("mouseout", function() {
+            div.transition()
+                .duration(200)
+                .style("opacity", 0)
+                .style("transform", "scale(0.75)");
+      });
   
   circles.selectAll("text")
     .data(function(d) {return [d]})
@@ -142,7 +184,7 @@ function buildTree ()
                             function(){set_time(document.getElementById("timeline").value)}
                             )
   
-  set_time(1280)
+  set_time(139)
 }
 
 function init()

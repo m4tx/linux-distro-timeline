@@ -1,6 +1,36 @@
-input#timeline {
+*
+{
+  margin:0;
+  padding:0;
+}
+
+#timeline {
     display: block;
-    width: 1280px;
+    height:40px;
+}
+
+#timeline_box
+{
+  background-color: rgba(0,0,0,0.5);
+  position:fixed;
+  left:0;
+  top:0;
+}
+
+#month_text
+{
+  position:fixed;
+  left:0;
+  top:40px;
+  padding:5px;
+  font-family:sans-serif;
+  font-size:20px;
+}
+
+#tree-svg
+{
+  margin-top:40px;
+  background-color:#eee;
 }
 
 div.tooltip {

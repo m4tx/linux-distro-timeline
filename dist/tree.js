@@ -1,6 +1,6 @@
 var T0=100, T=300
 var NUM=805
-var PADDING=30
+var PADDING=50
 var WIDTH=1800
 var HEIGHT=5000
 var SCALE_X=d3.scale.linear()
@@ -9,12 +9,9 @@ var SCALE_X=d3.scale.linear()
 var SCALE_Y=d3.scale.linear()
   .domain([0,NUM])
   .range([PADDING, HEIGHT-PADDING])
-var monthText;
 
 function set_time (t)
 {
-    monthText.text(numberToDate[t]);
-
   vertsplit
     .attr("x1", SCALE_X(t))
     .attr("x2", SCALE_X(t))
@@ -38,6 +35,7 @@ function set_time (t)
   .style("display", function(d){return d.time<t ? "block" :"none"})
   
   var now=numberToDate[t]
+  monthText.text(now)
   var year=now.slice(0,4)
   var month=now[5]=="0" ? now.slice(6,7) : now.slice(5,7)
   var size_now=popularity[year][month]
@@ -49,7 +47,6 @@ function set_time (t)
     .attr("r", function(d, i){return Math.pow(d.hits, 0.33)})
   circles.selectAll("text")
     .attr("visibility", function(d, i){ return Math.pow(d.hits, 0.33)>10 ? "visible" : "hidden" })
-  
 }
 
 function getTooltipX(x) {
@@ -126,20 +123,14 @@ function buildTree ()
     .attr("width", WIDTH)
     .attr("height", HEIGHT)
 
-  monthText = svg.append("text")
-                 .attr("x", 10)
-                 .attr("y", 25)
-                 .text("2014-06")
-                 .attr("font-family", "sans-serif")
-                 .attr("font-size", "20px")
-                 .attr("fill", "black");
-
-   var div = d3.select("body").append("div")
+  var div = d3.select("body").append("div")
      .attr("class", "tooltip")
      .style("opacity", 0);
 
   var slider = d3.select("#timeline")
-    .style("width", WIDTH+"px")
+    .style("width", WIDTH-2*PADDING+12+"px")
+    .style("margin-left", PADDING-6+"px")
+    .style("margin-right", PADDING-6+"px")
     .attr("min", T0)
     .attr("max", T)
     .attr("value", T-10)
@@ -208,6 +199,8 @@ function buildTree ()
     .attr("y1", 0)
     .attr("y2", HEIGHT)
 
+  monthText = d3.select("#month_text")
+  
   document.getElementById("timeline")
           .addEventListener("input",
                             function(){set_time(document.getElementById("timeline").value)}

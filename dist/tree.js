@@ -2,7 +2,7 @@ var T0=100, T=300
 var NUM=805
 var PADDING=30
 var WIDTH=1800
-var HEIGHT=900
+var HEIGHT=5000
 var SCALE_X=d3.scale.linear()
   .domain([T0,T])
   .range([PADDING, WIDTH-PADDING])
@@ -23,7 +23,7 @@ function set_time (t)
   .style("display", "block")
   .transition()
   .duration(T)
-  .style("opacity", function(d){return d.time<t ? 0.3 : 0})
+  .style("opacity", function(d){return d.time<t ? 0.2 : 0})
   .transition()
   .delay(T)
   .style("display", function(d){return d.time<t ? "block" :"none"})
@@ -46,9 +46,9 @@ function set_time (t)
   for (var distro in size_now)
     nodedict[distro].hits=size_now[distro]
   circles.selectAll("circle")
-    .attr("r", function(d, i){return Math.pow(d.hits, 0.3)})
+    .attr("r", function(d, i){return Math.pow(d.hits, 0.33)})
   circles.selectAll("text")
-    .attr("visibility", function(d, i){ return Math.pow(d.hits, 0.3)>10 ? "visible" : "hidden" })
+    .attr("visibility", function(d, i){ return Math.pow(d.hits, 0.33)>10 ? "visible" : "hidden" })
   
 }
 
@@ -152,7 +152,7 @@ function buildTree ()
     .enter().append("path")
       .attr("d", line_between)
       .style("fill", "none")
-      .style("stroke", "black")
+      .style("stroke", "steelblue")
       .style("stroke-width", 2)
 
   circles=root.selectAll("g")

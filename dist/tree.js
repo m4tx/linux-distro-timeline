@@ -23,7 +23,7 @@ function set_time (t)
   .style("display", "block")
   .transition()
   .duration(T)
-  .style("opacity", function(d){return d.time<t ? 1 : 0})
+  .style("opacity", function(d){return d.time<t ? 0.3 : 0})
   .transition()
   .delay(T)
   .style("display", function(d){return d.time<t ? "block" :"none"})
@@ -130,7 +130,7 @@ function buildTree ()
     .enter().append("path")
       .attr("d", line_between)
       .style("fill", "none")
-      .style("stroke", "rgba(255,255,255,0.5)")
+      .style("stroke", "black")
       .style("stroke-width", 2)
 
   circles=root.selectAll("g")
@@ -152,7 +152,7 @@ function buildTree ()
                 .duration(200)
                 .style("opacity", .9)
                 .style("transform", "scale(1)");
-            div.html("<img src=\"../data/img/" + d.id + ".png\">" + "<h3>"
+            div.html("<img src=\"img/" + d.id + ".png\">" + "<h3>"
                      + d.name + "</h3><br><strong>Package manager</strong>: "
                      + d.package_manager
                      + "<br><strong>First release</strong>: "

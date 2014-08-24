@@ -1,5 +1,5 @@
-var T=140
-var NUM=805
+var T=141
+var NUM=2805
 var PADDING=30
 var WIDTH=1900
 var HEIGHT=1000
@@ -47,7 +47,7 @@ function buildTree ()
     this.id=id
     this.time=dateToNumber[release_date.slice(0,7)]
     this.number=number
-    this.x=SCALE_X(starttime)
+    this.x=SCALE_X(this.time)
     this.y=SCALE_Y(number)
     this.radious=10
     

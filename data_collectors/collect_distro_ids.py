@@ -16,16 +16,16 @@
 # along with linux-distro-timeline; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-from os import listdir
-from os.path import isfile, isdir, join
+import glob
+
+import os
+from os.path import join
 import sys
 
-dirs = [f for f in listdir(sys.argv[1]) if isdir(join(sys.argv[1], f))]
-id_set = set()
-for dir in dirs:
-    path = join(sys.argv[1], dir)
-    files = [f for f in listdir(path) if isfile(join(path, f))]
-    for file in files:
-        id_set.add(file)
+id_set = set(
+    f.split(os.sep)[-1] for f in glob.glob(join(sys.argv[1], "*", "*")))
+# Remove non-existing "distros"
+id_set = filter(lambda x: x not in ['INDEX', 'INDEX~', 'NEW', 'dwcz.sh',
+                                    'netmax', 'pisi'], id_set)
 
 print(sorted(id_set))
